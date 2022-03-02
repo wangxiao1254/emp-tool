@@ -71,9 +71,9 @@ class SHA3_256_Calculator {
 		std::unique_ptr<BristolFashion> keccak_f; // ensures keccak_f is deleted when this is deleted.
 
 		// Sets up BristolFashion circuit for calculating Keccak_f, and allocates some space and constants.
-		SHA3_256_Calculator() { 
-			zero = CircuitExecution::circ_exec->public_label(false);
-			one = CircuitExecution::circ_exec->public_label(true);
+		SHA3_256_Calculator() {
+			CircuitExecution::circ_exec->public_label(&zero, false);
+			CircuitExecution::circ_exec->public_label(&one, true);
 			FILE * keccak_f_txt = fmemopen(emp_tool_circuits_files_bristol_fashion_Keccak_f_txt,
 					emp_tool_circuits_files_bristol_fashion_Keccak_f_txt_len,
 					"r");
@@ -98,9 +98,8 @@ class SHA3_256_Calculator {
 			index = 0;
 			for (i = 0; i < input_count; ++i) {
 				for (j = 0; j < input_sizes[i]; ++j) {
-					blocks[keccak_address_translator(index)] =
-						CircuitExecution::circ_exec->xor_gate(blocks[keccak_address_translator(index)],
-								inputs[i][j]);
+					CircuitExecution::circ_exec->xor_gate(blocks+keccak_address_translator(index), blocks + keccak_address_translator(index),
+								&(inputs[i][j]));
 					++index;
 					if (index == 1088) {
 						keccak_f->compute(blocks, blocks);

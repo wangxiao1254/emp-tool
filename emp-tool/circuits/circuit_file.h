@@ -19,17 +19,18 @@ template<typename T>
 void execute_circuit(block * wires, const T * gates, size_t num_gate) {
 	for(size_t i = 0; i < num_gate; ++i) {
 		if(gates[4*i+3] == AND_GATE) {
-			wires[gates[4*i+2]] = CircuitExecution::circ_exec->and_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+			CircuitExecution::circ_exec->and_gate(wires+ gates[4*i+2] , wires + gates[4*i], wires + gates[4*i+1]);
 		}
 		else if (gates[4*i+3] == XOR_GATE) {
-			wires[gates[4*i+2]] = CircuitExecution::circ_exec->xor_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+			CircuitExecution::circ_exec->xor_gate(wires + gates[4*i+2], wires + gates[4*i], wires + gates[4*i+1]);
 		}
 		else if (gates[4*i+3] == NOT_GATE) {
-			wires[gates[4*i+2]] = CircuitExecution::circ_exec->not_gate(wires[gates[4*i]]);
+			CircuitExecution::circ_exec->not_gate(wires + gates[4*i+2], wires + gates[4*i]);
 		} else {
-			block tmp = CircuitExecution::circ_exec->xor_gate(wires[gates[4*i]],  wires[gates[4*i+1]]);
-			block tmp2 = CircuitExecution::circ_exec->and_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
-			wires[gates[4*i+2]] = CircuitExecution::circ_exec->xor_gate(tmp, tmp2);
+			block tmp, tmp2;
+			CircuitExecution::circ_exec->xor_gate(&tmp, wires + gates[4*i],  wires + gates[4*i+1]);
+			CircuitExecution::circ_exec->and_gate(&tmp2, wires + gates[4*i], wires + gates[4*i+1]);
+			CircuitExecution::circ_exec->xor_gate(wires + gates[4*i+2], &tmp, &tmp2);
 		}
 	}
 }
@@ -116,13 +117,13 @@ class BristolFormat { public:
 		memcpy(wires.data()+n1, in2, n2*sizeof(block));
 		for(int i = 0; i < num_gate; ++i) {
 			if(gates[4*i+3] == AND_GATE) {
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->and_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+				CircuitExecution::circ_exec->and_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i], wires.data() + gates[4*i+1]);
 			}
 			else if (gates[4*i+3] == XOR_GATE) {
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->xor_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+				CircuitExecution::circ_exec->xor_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i], wires.data() + gates[4*i+1]);
 			}
 			else  
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->not_gate(wires[gates[4*i]]);
+				CircuitExecution::circ_exec->not_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i]);
 		}
 		memcpy(out, wires.data()+(num_wire-n3), n3*sizeof(block));
 	}
@@ -187,13 +188,13 @@ class BristolFashion { public:
 		memcpy(wires.data(), in, num_input*sizeof(block));
 		for(int i = 0; i < num_gate; ++i) {
 			if(gates[4*i+3] == AND_GATE) {
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->and_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+				CircuitExecution::circ_exec->and_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i], wires.data() + gates[4*i+1]);
 			}
 			else if (gates[4*i+3] == XOR_GATE) {
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->xor_gate(wires[gates[4*i]], wires[gates[4*i+1]]);
+				CircuitExecution::circ_exec->xor_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i], wires.data() + gates[4*i+1]);
 			}
 			else  
-				wires[gates[4*i+2]] = CircuitExecution::circ_exec->not_gate(wires[gates[4*i]]);
+				CircuitExecution::circ_exec->not_gate(wires.data() + gates[4*i+2], wires.data() + gates[4*i]);
 		}
 		memcpy(out, wires.data()+(num_wire-num_output), num_output*sizeof(block));
 	}

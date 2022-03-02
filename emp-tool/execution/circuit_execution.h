@@ -15,10 +15,10 @@ class CircuitExecution { public:
 #else
 	static __thread CircuitExecution * circ_exec;
 #endif
-	virtual block and_gate(const block& in1, const block& in2) = 0;
-	virtual block xor_gate(const block&in1, const block&in2) = 0;
-	virtual block not_gate(const block& in1) = 0;
-	virtual block public_label(bool b) = 0;
+	virtual void and_gate(void * out, const void * in1, const void * in2) = 0;
+	virtual void xor_gate(void * out, const void * in1, const void * in2) = 0;
+	virtual void not_gate(void * out, const void * in1) = 0;
+	virtual void public_label(void * out, bool b) = 0;
 	virtual uint64_t num_and() {
 		return -1;
 	}

@@ -124,8 +124,9 @@ inline void div_full(Bit * vquot, Bit * vrem, const Bit * op1, const Bit * op2,
 inline void Integer::init(bool * b, int len, int party) {
 	bits.resize(len);
 	if (party == PUBLIC) {
-		block one = CircuitExecution::circ_exec->public_label(true);
-		block zero = CircuitExecution::circ_exec->public_label(false);
+		block one, zero;
+		CircuitExecution::circ_exec->public_label(&one, true);
+		CircuitExecution::circ_exec->public_label(&zero, false);
 		for(int i = 0; i < len; ++i)
 			bits[i] = b[i] ? one : zero;
 	}

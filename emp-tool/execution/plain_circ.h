@@ -48,18 +48,18 @@ public:
 		uint64_t *arr = (uint64_t*) &b;
 		return arr[0] == P0 or arr[0] == P1;
 	}
-	block public_label(bool b) override {
-		return b? public_one : public_zero;
+	void public_label(void * out, bool b) override {
+		*((block*)out) =  b ? public_one : public_zero;
 	}
-	block and_gate(const block& a, const block& b) override {
-		uint64_t *arr_a = (uint64_t*) &a;
-		uint64_t *arr_b = (uint64_t*) &b;
+	void and_gate(void * out, const void* a, const void * b) override {
+		const uint64_t *arr_a = (const uint64_t*) a;
+		const uint64_t *arr_b = (const uint64_t*) b;
 		if (arr_a[0] == P1) {
-			return b;
+			memcpy(out, b, sizeof(block));
 		} else if (arr_b[0] == P1) {
-			return a;
+			memcpy(out, a, sizeof(block));
 		} else if(arr_a[0] == P0 or arr_b[0] == P0) {
-			return public_zero;
+			*((block*)out) = public_zero;
 		} else {
 			block res = zero_block;
 			uint64_t *arr = (uint64_t*) &res;
@@ -70,20 +70,20 @@ public:
 			gid++;
 			gates++;
 			ands++;
-			return res;
+			*((block*)out) = res;
 		}
 	}
-	block xor_gate(const block&a, const block& b) override {
-		uint64_t *arr_a = (uint64_t*) &a;
-		uint64_t *arr_b = (uint64_t*) &b;
+	void xor_gate(void * out, const void * a, const void * b) override {
+		const uint64_t *arr_a = (const uint64_t*) a;
+		const uint64_t *arr_b = (const uint64_t*) b;
 		if (arr_a[0] == P1) {
-			return not_gate(b);
+			not_gate(out, b);
 		} else if (arr_b[0] == P1) {
-			return not_gate(a);
+			not_gate(out, a);
 		} else if(arr_a[0] == P0) {
-			return b;
+			memcpy(out, b, sizeof(block));
 		} else if(arr_b[0] == P0){
-			return a;
+			memcpy(out, a, sizeof(block));
 		} else {
 			block res = zero_block;
 			uint64_t *arr = (uint64_t*) &res;
@@ -93,7 +93,7 @@ public:
 				fout <<"2 1 "<<arr_a[1] <<" "<<arr_b[1]<<" "<<gid<<" XOR"<<std::endl;
 			gates++;
 			gid++;
-			return res;
+			*((block*)out) = res;
 		}
 	}
 	block private_label(bool b) {
@@ -112,12 +112,12 @@ public:
 			return false;
 		else return true;
 	}
-	block not_gate(const block&a) override {
-		uint64_t *arr_a = (uint64_t*) &a;
+	void not_gate(void * out, const void * a) override {
+		const uint64_t *arr_a = (const uint64_t*) a;
 		if (arr_a[0] == P1) {
-			return public_zero;
+			*((block*)out) = public_zero;
 		} else if (arr_a[0] == P0) {
-			return public_one;
+			*((block*)out) = public_one;
 		} else {
 			block res = zero_block;
 			uint64_t *arr = (uint64_t*) &res;
@@ -128,7 +128,7 @@ public:
 				fout <<"1 1 "<<arr_a[1] <<" "<<gid<<" INV"<<std::endl;
 			gid++;
 			gates++;
-			return res;
+			*((block*)out) = res;
 		}
 	}
 	uint64_t num_and() override {

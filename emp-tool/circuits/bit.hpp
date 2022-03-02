@@ -1,6 +1,6 @@
 inline Bit::Bit(bool b, int party) {
 	if (party == PUBLIC)
-		bit = CircuitExecution::circ_exec->public_label(b);
+		CircuitExecution::circ_exec->public_label(&bit, b);
 	else ProtocolExecution::prot_exec->feed(&bit, party, &b, 1); 
 }
 
@@ -35,16 +35,16 @@ inline Bit Bit::operator!=(const Bit& rhs) const {
 
 inline Bit Bit::operator &(const Bit& rhs) const{
 	Bit res;
-	res.bit = CircuitExecution::circ_exec->and_gate(bit, rhs.bit);
+	CircuitExecution::circ_exec->and_gate(&res.bit, &bit, &rhs.bit);
 	return res;
 }
 inline Bit Bit::operator ^(const Bit& rhs) const{
 	Bit res;
-	res.bit = CircuitExecution::circ_exec->xor_gate(bit, rhs.bit);
+	CircuitExecution::circ_exec->xor_gate(&res.bit, &bit, &rhs.bit);
 	return res;
 }
 inline Bit Bit::operator ^=(const Bit& rhs) {
-	this->bit = CircuitExecution::circ_exec->xor_gate(bit, rhs.bit);
+	CircuitExecution::circ_exec->xor_gate(&bit, &bit, &rhs.bit);
 	return (*this);
 }
 
@@ -53,5 +53,7 @@ inline Bit Bit::operator |(const Bit& rhs) const{
 }
 
 inline Bit Bit::operator!() const {
-	return CircuitExecution::circ_exec->not_gate(bit);
+	Bit res;
+	CircuitExecution::circ_exec->not_gate(&res.bit, &bit);
+	return res;
 }
